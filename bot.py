@@ -1,8 +1,10 @@
-import discord
+# import discord
 from secret import TOKEN
 from discord.ext import commands
 import psycopg2
 from datetime import datetime
+import praw
+import random
 
 description = '''LIT Bot v0.2'''
 bot = commands.Bot(command_prefix='?', description=description)
@@ -29,6 +31,7 @@ async def hello(ctx):
 
 @bot.event
 async def on_voice_state_update(member, before, after):
+  print(hash(member))
   if before.channel == None and after.channel != None: # member joins voice channel
     current_voice_channel_members[member.id] = datetime.now()
     print(member.display_name + " joined " + after.channel.name)
@@ -59,5 +62,16 @@ async def stats(ctx):
     time = str(time_sums[user_id]).split('.')[0] # last part removes microseconds
     stats += bot.get_user(user_id).name + ": " + time + "\n"
   await ctx.send(stats)
+
+@bot.command(name='meme', help='Pakt een epische meme van r/memes')
+async def on_meme(ctx):
+    memes = praw.Reddit(client_id="nILEhRzBOkWsUA",
+                     client_secret="xCkBoPYyBULhvk1-wq9DjQ0Bw3k",
+                     user_agent="TommieBoyRandomDiscord").subreddit('memes').hot()
+    meme_to_pick = random.randint(1, 10)
+    for i in range(0, meme_to_pick):
+        submission = next(x for x in memes if not x.stickied)
+
+    await ctx.channel.send(submission.url)
 
 bot.run(TOKEN)
