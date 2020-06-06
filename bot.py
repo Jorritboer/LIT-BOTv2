@@ -1,10 +1,11 @@
-# import discord
+import discord
 from secret import TOKEN
 from discord.ext import commands
 import psycopg2
 from datetime import datetime
 import praw
 import random
+import time
 
 description = '''LIT Bot v0.2'''
 bot = commands.Bot(command_prefix='?', description=description)
@@ -73,5 +74,37 @@ async def on_meme(ctx):
         submission = next(x for x in memes if not x.stickied)
 
     await ctx.channel.send(submission.url)
+
+@bot.command(name='kick', help='Vote kick iemand uit de discord! (@user)')
+async def on_kick(ctx, user: discord.Member):
+    vkmessage = await ctx.send("Kick Player: " + user.mention + "?")  # send a message that gets called back later
+    emojies = ['👍', '👎']
+    for emoji in emojies:
+        await vkmessage.add_reaction(emoji)     # add the emojies to the vote kick message
+
+    time.sleep(10)    # wait 10 sec before counting the emojies
+    vkmessage = await ctx.fetch_message(vkmessage.id)
+
+    pos, neg = 0, 0
+    for emoji in vkmessage.reactions:   # Count reactions
+        if str(emoji) == '👍':
+            pos = emoji.count
+        if str(emoji) == '👎':
+            neg = emoji.count
+    if pos-neg >= 2:            # When kicked, get link send to join back
+        await user.kick()
+        link = await ctx.channel.create_invite(max_age = 300)
+        await discord.Member.send(user, "Invite: " + link.url)
+        await ctx.send("Kicking Player: " + user.mention + "...")
+    else:
+        await ctx.send(user.mention + " has not been kicked")
+              
+@on_kick.error
+async def kick_error(ctx, error):
+    if isinstance(error, commands.BadArgument):
+        await ctx.send('Please enter member using @')
+    else:
+        print("error: ", error)
+
 
 bot.run(TOKEN)
