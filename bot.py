@@ -91,10 +91,10 @@ async def on_kick(ctx, user: discord.Member):
             pos = emoji.count
         if str(emoji) == '👎':
             neg = emoji.count
-    if pos-neg >= 2:            # When kicked, get link send to join back
-        await user.kick()
+    if pos-neg>=2:            # When kicked, get link send to join back
         link = await ctx.channel.create_invite(max_age = 300)
         await discord.Member.send(user, "Invite: " + link.url)
+        await user.kick()
         await ctx.send("Kicking Player: " + user.mention + "...")
     else:
         await ctx.send(user.mention + " has not been kicked")
