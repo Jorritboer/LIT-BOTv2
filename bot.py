@@ -57,7 +57,7 @@ async def stats(ctx):
       time_sums[user_id] = leave_time - join_time
     else:
       time_sums[user_id] += leave_time - join_time
-  time_sums = {k: v for k, v in sorted(time_sums.items(), key=lambda item: item[1])} # does the sorting somehow
+  time_sums = {k: v for k, v in sorted(time_sums.items(), key=lambda item: item[1], reverse=True)} # does the sorting somehow
 
   stats = ""
   for user_id in time_sums:
