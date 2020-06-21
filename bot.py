@@ -59,10 +59,11 @@ async def stats(ctx):
       time_sums[user_id] += leave_time - join_time
   time_sums = {k: v for k, v in sorted(time_sums.items(), key=lambda item: item[1], reverse=True)} # does the sorting somehow
 
-  stats = ""
+  stats = "```"
   for user_id in time_sums:
     time = str(time_sums[user_id]).split('.')[0] # last part removes microseconds
     stats += bot.get_user(user_id).name + ": " + time + "\n"
+  stats+= "```"
   await ctx.send(stats)
 
 @bot.command(name='meme', help='Pakt een epische meme van r/memes')
